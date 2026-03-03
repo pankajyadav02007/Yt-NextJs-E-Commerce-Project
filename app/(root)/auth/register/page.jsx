@@ -22,7 +22,7 @@ import Link from "next/link";
 import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
 import axios from "axios";
 
-const SignUpPage = () => {
+const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
 
@@ -50,11 +50,11 @@ const SignUpPage = () => {
     },
   });
 
-  const handleSignupSubmit = async (value) => {
+  const handleRegisterSubmit = async (value) => {
     try {
       setLoading(true);
       const { data: registerResponse } = await axios.post(
-        "/api/auth/signup",
+        "/api/auth/register",
         value,
       );
       if (!registerResponse.success) {
@@ -88,7 +88,7 @@ const SignUpPage = () => {
         </div>
         <div className="mt-5">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSignupSubmit)}>
+            <form onSubmit={form.handleSubmit(handleRegisterSubmit)}>
               <div className="mb-5">
                 <FormField
                   control={form.control}
@@ -97,7 +97,7 @@ const SignUpPage = () => {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <input type="text" placeholder="Zon deo" {...field} />
+                        <input type="text" placeholder="Zohn deo" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -172,7 +172,7 @@ const SignUpPage = () => {
               <div className="mb-5">
                 <ButtonLoading
                   type="submit"
-                  text="Sign Up"
+                  text="Register"
                   className="w-full cursor-pointer"
                   loading={loading}
                 />
@@ -192,4 +192,5 @@ const SignUpPage = () => {
     </Card>
   );
 };
-export default SignUpPage;
+
+export default RegisterPage;

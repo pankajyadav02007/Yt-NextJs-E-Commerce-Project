@@ -19,7 +19,7 @@ import { z } from "zod";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import Link from "next/link";
-import { WEBSITE_SIGNUP } from "@/routes/WebsiteRoute";
+import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -119,9 +119,9 @@ const LoginPage = () => {
               </div>
               <div className="text-center">
                 <div className="flex justify-center items-center gap-2">
-                  <p>Don't have account ?</p>
+                  <p>Do not have account ?</p>
                   <Link
-                    href={WEBSITE_SIGNUP}
+                    href={WEBSITE_REGISTER}
                     className="text-primary underline"
                   >
                     Create Account !

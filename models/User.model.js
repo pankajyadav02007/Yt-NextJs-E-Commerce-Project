@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["use", "admin"],
+      enum: ["user", "admin"],
       default: "user",
     },
     name: {
@@ -57,10 +57,10 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
-  next();
+  // next();
 });
 
 userSchema.methods = {
@@ -69,7 +69,6 @@ userSchema.methods = {
   },
 };
 
-const UserModel =
-  mongoose.model.User || mongoose.model("User", userSchema, "users");
+const UserModel = mongoose.model.User || mongoose.model("User", userSchema);
 
 export default UserModel;
