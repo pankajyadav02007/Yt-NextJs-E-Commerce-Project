@@ -14,7 +14,7 @@ export async function POST(request) {
 
     const secret = new TextEncoder().encode(process.env.SECRET_KEY);
     const decoded = await jwtVerify(token, secret);
-    const userId = decoded.payload.userId;
+    const userId = decoded.payload.userId.toString();
 
     // get user
     const user = await UserModel.findById(userId);

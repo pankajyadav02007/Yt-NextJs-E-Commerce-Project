@@ -36,7 +36,7 @@ export async function POST(request) {
 
       // ✅ registered but not verified → resend email
       const secret = new TextEncoder().encode(process.env.SECRET_KEY);
-      const token = await new SignJWT({ userId: existingUser._id })
+      const token = await new SignJWT({ userId: existingUser._id.toString() })
         .setIssuedAt()
         .setExpirationTime("1h")
         .setProtectedHeader({ alg: "HS256" })
