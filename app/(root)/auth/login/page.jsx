@@ -42,25 +42,25 @@ const LoginPage = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: true,
+      password: "",
     },
   });
 
   const handleLoginSubmit = async (value) => {
     try {
       setLoading(true);
-      const { data: registerResponse } = await axios.post(
+      const { data: loginResponse } = await axios.post(
         "/api/auth/login",
         value,
       );
-      if (!registerResponse.success) {
-        throw new Error(registerResponse.message);
+      if (!loginResponse.success) {
+        throw new Error(loginResponse.message);
       }
 
       setOtpEmail(value.email);
 
       form.reset();
-      showToast("success", registerResponse.message);
+      showToast("success", loginResponse.message);
     } catch (error) {
       showToast("error", error.message);
     } finally {
@@ -69,20 +69,20 @@ const LoginPage = () => {
   };
 
   // otp verification
-  const handleOtpVerification = async () => {
+  const handleOtpVerification = async (data) => {
     try {
       setOtpVerificaticonLoading(true);
-      const { data: registerResponse } = await axios.post(
-        "/api/auth/verify-otp",
-        value,
-      );
-      if (!registerResponse.success) {
-        throw new Error(registerResponse.message);
+      const { data: otpResponse } = await axios.post("/api/auth/verify-otp", {
+        email: otpEmail,
+        otp: data.otp,
+      });
+      if (!otpResponse.success) {
+        throw new Error(otpResponse.message);
       }
 
       setOtpEmail("");
 
-      showToast("success", registerResponse.message);
+      showToast("success", otpResponse.message);
     } catch (error) {
       showToast("error", error.message);
     } finally {

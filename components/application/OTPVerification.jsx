@@ -1,6 +1,6 @@
 import { zSchema } from "@/lib/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import ButtonLoading from "./ButtonLoading";
 import {
@@ -12,23 +12,46 @@ import {
   FormMessage,
 } from "../ui/form";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
+import { showToast } from "@/lib/showToast";
+import axios from "axios";
 
 const OTPVerification = ({ email, onSubmit, loading }) => {
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
+
   const formSchema = zSchema.pick({
     otp: true,
-    email: true,
+    // email: true,
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       otp: "",
-      email: email,
+      // email: email,
     },
   });
 
   const handleOtpVerification = async (value) => {
     onSubmit(value);
+  };
+
+  const resendOtp = async () => {
+    try {
+      setIsResendingOtp(true);
+      const { data: resendOtpResponse } = await axios.post(
+        "/api/auth/resend-otp",
+        { email },
+      );
+      if (!resendOtpResponse.success) {
+        throw new Error(resendOtpResponse.message);
+      }
+
+      showToast("success", resendOtpResponse.message);
+    } catch (error) {
+      showToast("error", error.message);
+    } finally {
+      setIsResendingOtp(false);
+    }
   };
 
   return (
@@ -78,12 +101,17 @@ const OTPVerification = ({ email, onSubmit, loading }) => {
               loading={loading}
             />
             <div className="text-center mt-5">
-              <button
-                type="button"
-                className="text-blue-500 cursor-pointer hover:underline"
-              >
-                Send OTP
-              </button>
+              {!isResendingOtp ? (
+                <button
+                  onClick={resendOtp}
+                  type="button"
+                  className="text-blue-500 cursor-pointer hover:underline"
+                >
+                  Send OTP
+                </button>
+              ) : (
+                <span className="text-md">Resending.....</span>
+              )}
             </div>
           </div>
         </form>

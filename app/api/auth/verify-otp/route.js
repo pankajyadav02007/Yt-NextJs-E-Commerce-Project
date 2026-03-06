@@ -4,6 +4,7 @@ import { zSchema } from "@/lib/zodSchema";
 import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
+import { cookies } from "next/headers";
 
 export async function POST(request) {
   try {
@@ -33,7 +34,7 @@ export async function POST(request) {
       return response(false, 404, "user not found");
     }
 
-    constLoggedInUserData = {
+    const loggedInUserData = {
       _id: getUser._id,
       _role: getUser._role,
       _name: getUser._name,
@@ -44,12 +45,15 @@ export async function POST(request) {
     const token = await new SignJWT(loggedInUserData)
       .setIssuedAt()
       .setExpirationTime("24h")
-      .setProtectedHeader({ alg: "HS256" });
+      .setProtectedHeader({ alg: "HS256" })
+      .sign(secret);
 
-    const cookieStore = await cookies({
+    const cookieStore = await cookies();
+
+    cookieStore.set({
       name: "access_token",
       value: token,
-      httpOnly: process.env.NODE_ENV === "production",
+      httpOnly: true,
       path: "/",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
