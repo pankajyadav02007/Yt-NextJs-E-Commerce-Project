@@ -5,6 +5,7 @@ import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { sendMail } from "@/lib/sendMail";
+import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
@@ -24,6 +25,7 @@ export async function POST(request) {
     }
 
     const { name, email, password } = validatedData.data;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // 🔥 CHANGE STARTS HERE
     const existingUser = await UserModel.findOne({ email });
@@ -62,7 +64,7 @@ export async function POST(request) {
     const NewRegistration = new UserModel({
       name,
       email,
-      password,
+      password: hashedPassword,
       isEmailVerified: false,
     });
 

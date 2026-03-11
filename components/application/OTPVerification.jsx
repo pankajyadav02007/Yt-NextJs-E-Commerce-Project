@@ -1,3 +1,4 @@
+"use client";
 import { zSchema } from "@/lib/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";

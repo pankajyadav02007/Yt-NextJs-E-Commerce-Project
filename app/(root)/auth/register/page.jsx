@@ -61,11 +61,11 @@ const RegisterPage = () => {
       if (!registerResponse.success) {
         throw new Error(registerResponse.message);
       }
-
+      console.log(registerResponse);
       form.reset();
       showToast("success", registerResponse.message);
     } catch (error) {
-      showToast("error", registerResponse.message);
+      showToast("error", error.message);
     } finally {
       setLoading(false);
     }
