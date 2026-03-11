@@ -19,15 +19,23 @@ import { z } from "zod";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import Link from "next/link";
-import { WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from "@/routes/WebsiteRoute";
+import {
+  USER_DASHBOARD,
+  WEBSITE_REGISTER,
+  WEBSITE_RESETPASSWORD,
+} from "@/routes/WebsiteRoute";
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import OTPVerification from "@/components/application/OTPVerification";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/reducer/authReducer";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ADMIN_DASHBOARD } from "@/routes/AdminPanelRoute";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [otpVerificaticonLoading, setOtpVerificaticonLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
@@ -87,6 +95,13 @@ const LoginPage = () => {
       showToast("success", otpResponse.message);
 
       dispatch(login(otpResponse.data));
+      if (searchParams.has("callback")) {
+        router.push(searchParams.get("callback"));
+      } else {
+        otpResponse.data.role === "admin"
+          ? router.push(ADMIN_DASHBOARD)
+          : router.push(USER_DASHBOARD);
+      }
     } catch (error) {
       showToast("error", error.message);
     } finally {

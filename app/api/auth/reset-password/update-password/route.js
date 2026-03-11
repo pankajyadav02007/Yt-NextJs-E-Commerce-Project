@@ -33,7 +33,7 @@ export async function PUT(request) {
       return response(false, 404, "User not found");
     }
 
-    getUser.password = password;
+    getUser.password = await bcrypt.hash(password, 10);
     await getUser.save();
     return response(true, 200, "Password update success");
   } catch (error) {

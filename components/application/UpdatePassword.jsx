@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { zSchema } from "@/lib/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -51,7 +50,7 @@ const UpdatePassword = ({ email }) => {
   const handlePasswordUpdate = async (value) => {
     try {
       setLoading(true);
-      const { data: passwordUpdate } = await axios.post(
+      const { data: passwordUpdate } = await axios.put(
         "/api/auth/reset-password/update-password",
         value,
       );
