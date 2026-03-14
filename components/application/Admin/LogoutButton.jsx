@@ -5,7 +5,7 @@ import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
 import { logout } from "@/store/reducer/authReducer";
 import axios from "axios";
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useDispatch } from "react-redux";
 
