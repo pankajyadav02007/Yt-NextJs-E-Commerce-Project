@@ -19,8 +19,10 @@ const UploadMedia = ({ isMultiple }) => {
       onError={handleOnError}
       onQueuesEnd={handleOnQueueEnd}
       config={{
-        cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-        apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+        cloud: {
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+        },
       }}
       options={{
         multiple: isMultiple,
