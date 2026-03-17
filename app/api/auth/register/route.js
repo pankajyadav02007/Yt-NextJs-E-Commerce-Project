@@ -81,7 +81,7 @@ export async function POST(request) {
       "Email Verification request from Developer Team",
       email,
       emailVerificationLink(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email/${token}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`,
       ),
     );
 

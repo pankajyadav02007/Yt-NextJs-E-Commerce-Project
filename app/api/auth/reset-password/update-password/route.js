@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import catchError, { response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
+import bcrypt from "bcryptjs";
 
 export async function PUT(request) {
   try {
@@ -37,6 +38,6 @@ export async function PUT(request) {
     await getUser.save();
     return response(true, 200, "Password update success");
   } catch (error) {
-    catchError(error);
+    return catchError(error);
   }
 }
