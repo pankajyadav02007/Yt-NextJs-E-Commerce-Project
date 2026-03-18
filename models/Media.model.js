@@ -31,7 +31,7 @@ const mediaSchema = new mongoose.Schema(
       trim: true,
     },
     deletedAt: {
-      type: Data,
+      type: Date,
       default: null,
       index: true,
     },
