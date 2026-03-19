@@ -28,6 +28,7 @@ const UploadMedia = ({ isMultiple }) => {
         const { data: mediaUploadResponse } = await axios.post(
           "/api/media/create",
           uploadedFiles,
+          { withCredentials: true },
         );
         if (!mediaUploadResponse.success) {
           throw new Error(mediaUploadResponse.message);
