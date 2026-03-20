@@ -21,7 +21,7 @@ export async function GET(request) {
     let filter = {};
     if (deleteType === "SD") {
       filter = { deletedAt: null };
-    } else if (deletedAt === "PD") {
+    } else if (deleteType === "PD") {
       filter = { deletedAt: { $ne: null } };
     }
 
@@ -34,7 +34,7 @@ export async function GET(request) {
     const totalMedia = await MediaModel.countDocuments(filter);
 
     return NextResponse.json({
-      mediaData: mediaData,
+      mediaData: mediaData || [],
       hasMore: (page + 1) * limit < totalMedia,
     });
   } catch (error) {
