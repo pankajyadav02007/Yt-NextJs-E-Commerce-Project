@@ -58,7 +58,7 @@ const UploadMedia = ({ isMultiple }) => {
       }}
     >
       {({ open }) => (
-        <Button onClick={() => open()}>
+        <Button className="cursor-pointer" onClick={() => open()}>
           <Plus />
           Upload Media
         </Button>

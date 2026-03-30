@@ -5,11 +5,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ADMIN_MEDIA_SHOW } from "@/routes/AdminPanelRoute";
-import { EllipsisVertical } from "lucide-react";
+import { showToast } from "@/lib/showToast";
+import { ADMIN_MEDIA_EDIT, ADMIN_MEDIA_SHOW } from "@/routes/AdminPanelRoute";
+import { EllipsisVertical, Link2, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { de } from "zod/v4/locales";
 
 const Media = ({
   media,
@@ -18,14 +20,26 @@ const Media = ({
   selectedMedia,
   setSelectedMedia,
 }) => {
-  const handleCheck = () => {};
+  const handleCheck = () => {
+    let newSelectedMedia = [];
+    if (selectedMedia.includes(media._id)) {
+      newSelectedMedia = selectedMedia.filter((m) => m !== media._id);
+    } else {
+      newSelectedMedia = [...selectedMedia, media._id];
+    }
+    setSelectedMedia(newSelectedMedia);
+  };
+  const handleCopyLink = async (url) => {
+    await navigator.clipboard.writeText(url);
+    showToast("success", "Link Copied.");
+  };
   return (
     <div className="border border-gray-200 dark:border-gray-800 relative group rounded overflow-hidden">
       <div className="absolute top-2 left-2 z-20">
         <Checkbox
           checked={selectedMedia.includes(media._id)}
           onCheckedChange={handleCheck}
-          className="border-primary"
+          className="border-primary cursor-pointer"
         />
       </div>
 
@@ -39,11 +53,26 @@ const Media = ({
           <DropdownMenuContent align="start">
             {deleteType === "SD" && (
               <>
-                <DropdownMenuItem asChild>
-                  <Link href={ADMIN_MEDIA_SHOW}></Link>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={ADMIN_MEDIA_EDIT(media._id)}>
+                    <Pencil />
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleCopyLink(media.secure_url)}
+                >
+                  <Link2 />
+                  Copy Link
                 </DropdownMenuItem>
               </>
             )}
+
+            <DropdownMenuItem className="cursor-pointer">
+              <Trash2 color="red" />
+              {deleteType === "SD" ? "Move Into Trans" : "Delete Permanently"}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
