@@ -1,3 +1,5 @@
+"use client";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -69,7 +71,10 @@ const Media = ({
               </>
             )}
 
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => handleDelete([media._id], deleteType)}
+            >
               <Trash2 color="red" />
               {deleteType === "SD" ? "Move Into Trans" : "Delete Permanently"}
             </DropdownMenuItem>

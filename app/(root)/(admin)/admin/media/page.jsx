@@ -2,12 +2,17 @@
 import BreadCrumb from "@/components/application/Admin/BreadCrumb";
 import Media from "@/components/application/Admin/Media";
 import UploadMedia from "@/components/application/Admin/UploadMedia";
+import ButtonLoading from "@/components/application/ButtonLoading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import useDeleteMutation from "@/hooks/useDeleteMutation";
 import { ADMIN_DASHBOARD, ADMIN_MEDIA_SHOW } from "@/routes/AdminPanelRoute";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -18,6 +23,7 @@ const breadcrumbData = [
   { href: "", label: "Media" },
 ];
 const MediaPage = () => {
+  const queryClient = useQueryClient();
   const [deleteType, setDeleteType] = useState("SD");
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -73,7 +79,10 @@ const MediaPage = () => {
       c = confirm("Are you sure you want to delete the data permanently?");
     }
     if (c) {
-      deleteMutation.mutate({ selectedMedia, deleteType });
+      deleteMutation.mutate({
+        ids: selectedMedia,
+        deleteType,
+      });
     }
     setSelectAll(false);
     setSelectedMedia([]);
@@ -84,7 +93,7 @@ const MediaPage = () => {
   };
 
   useEffect(() => {
-    if (selectAll) {
+    if (selectAll && data?.pages) {
       const ids = data.pages.flatMap((page) =>
         page.mediaData.map((media) => media._id),
       );
@@ -92,7 +101,7 @@ const MediaPage = () => {
     } else {
       setSelectedMedia([]);
     }
-  }, [selectAll]);
+  }, [selectAll, data]);
 
   return (
     <div>
@@ -104,7 +113,9 @@ const MediaPage = () => {
               {deleteType === "SD" ? "Media" : "Media Transh"}
             </h4>
             <div className="flex items-center gap-5">
-              {deleteType === "SD" && <UploadMedia />}
+              {deleteType === "SD" && (
+                <UploadMedia isMultiple={true} queryClient={queryClient} />
+              )}
               <div className="flex gap-3">
                 {deleteType === "SD" ? (
                   <Button type="button" variant="destructive">
@@ -121,7 +132,7 @@ const MediaPage = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-5">
           {selectedMedia.length > 0 && (
             <div className="py-2 px-3 bg-violet-200 rounded flex justify-between items-center mb-2">
               <label className="flex justify-center items-center gap-2 ">
@@ -168,22 +179,40 @@ const MediaPage = () => {
           ) : status === "error" ? (
             <div className="text-red-500">{error.message}</div>
           ) : (
-            <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 mb-5">
-              {data?.pages?.map((page, index) => (
-                <React.Fragment key={index}>
-                  {page?.mediaData?.map((media) => (
-                    <Media
-                      key={media._id}
-                      media={media}
-                      handleDelete={handleDelete}
-                      deleteType={deleteType}
-                      selectedMedia={selectedMedia}
-                      setSelectedMedia={setSelectedMedia}
-                    />
-                  ))}
-                </React.Fragment>
-              ))}
-            </div>
+            <>
+              {data.pages.flatMap((page) =>
+                page.mediaData.map((media) => media._id),
+              ).length === 0 && (
+                <div className="text-center">Data not found .</div>
+              )}
+
+              <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 mb-5">
+                {data?.pages?.map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page?.mediaData?.map((media) => (
+                      <Media
+                        key={media._id}
+                        media={media}
+                        handleDelete={handleDelete}
+                        deleteType={deleteType}
+                        selectedMedia={selectedMedia}
+                        setSelectedMedia={setSelectedMedia}
+                      />
+                    ))}
+                  </React.Fragment>
+                ))}
+              </div>
+            </>
+          )}
+
+          {hasNextPage && (
+            <ButtonLoading
+              type="button"
+              loading={isFetching}
+              onClick={() => fetchNextPage()}
+              className="cursor-pointer"
+              text="Load More"
+            />
           )}
         </CardContent>
       </Card>

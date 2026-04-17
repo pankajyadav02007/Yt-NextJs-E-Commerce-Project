@@ -1,5 +1,8 @@
-const { showToast } = require("@/lib/showToast");
-const { useQueryClient, useMutation } = require("@tanstack/react-query");
+"use client";
+
+import axios from "axios";
+import { showToast } from "@/lib/showToast";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 const useDeleteMutation = (queryKey, deleteEndPoint) => {
   const queryClient = useQueryClient();
@@ -11,15 +14,19 @@ const useDeleteMutation = (queryKey, deleteEndPoint) => {
         method: deleteType === "PD" ? "DELETE" : "PUT",
         data: { ids, deleteType },
       });
+
       if (!response.success) {
         throw new Error(response.message);
       }
+
       return response;
     },
+
     onSuccess: (data) => {
       showToast("success", data.message);
-      queryClient.invalidateQueries([queryKey]);
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
+
     onError: (error) => {
       showToast("error", error.message);
     },

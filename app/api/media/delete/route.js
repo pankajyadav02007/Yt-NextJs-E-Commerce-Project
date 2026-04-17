@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/databaseConnection";
+import cloudinary from "@/lib/cloudinary";
 import catchError, { isAuthenticated, response } from "@/lib/helperFunction";
 import MediaModel from "@/models/Media.model";
 import mongoose from "mongoose";
@@ -17,7 +18,7 @@ export async function PUT(request) {
     const deleteType = payload.deleteType;
 
     if (!Array.isArray(ids) || ids.length === 0) {
-      return response(false, 400, "Invalid or empety id List");
+      return response(false, 400, "Invalid or empty id List");
     }
 
     const media = await MediaModel.find({ _id: { $in: ids } }).lean();
@@ -25,24 +26,26 @@ export async function PUT(request) {
       return response(false, 404, "Data not found");
     }
 
-    if (!["SD", RSD].includes(deleteType)) {
+    if (!["SD", "RSD"].includes(deleteType)) {
       return response(
         false,
         400,
-        "Invalid delete opration. Delete type should be SD or RSD for this route",
+        "Invalid delete operation. Delete type should be SD or RSD for this route",
       );
     }
 
     if (deleteType === "SD") {
       await MediaModel.updateMany(
         { _id: { $in: ids } },
-        { $set: { deletedAt: new Data().toISOString() } },
+        { $set: { deletedAt: new Date().toISOString() } },
       );
+      return response(true, 200, "Media moved to trash successfully");
     } else {
       await MediaModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: null } },
       );
+      return response(true, 200, "Media restored successfully");
     }
   } catch (error) {
     return catchError(error);
@@ -50,9 +53,6 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const auth = await isAuthenticated("admin");
     if (!auth.isAuth) {
@@ -66,35 +66,36 @@ export async function DELETE(request) {
     const deleteType = payload.deleteType;
 
     if (!Array.isArray(ids) || ids.length === 0) {
-      return response(false, 400, "Invalid or empety id List");
+      return response(false, 400, "Invalid or empty id List");
     }
 
-    const media = await MediaModel.find({ _id: { $in: ids } })
-      .session(session)
-      .lean();
-    if (!media.length) {
-      return response(false, 404, "Data not found");
-    }
-
-    if (!deleteType === "PD") {
+    if (deleteType !== "PD") {
       return response(
         false,
         400,
-        "Invalid delete opration. Delete type should be PD for this route",
+        "Invalid delete operation. Delete type should be PD for this route",
       );
     }
 
-    await MediaModel.deleteMany({ _id: { $in: ids } }).session(session);
+    const media = await MediaModel.find({ _id: { $in: ids } }).lean();
+
+    if (!media.length) {
+      return response(false, 404, "Data not found");
+    }
 
     // delete all media from cloudinary.
     const publicIds = media.map((m) => m.public_id);
 
     try {
       await cloudinary.api.delete_resources(publicIds);
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
+    } catch (cloudinaryError) {
+      console.error("Cloudinary deletion error:", cloudinaryError);
+      return response(false, 500, "Failed to delete images from storage");
     }
+
+    await MediaModel.deleteMany({ _id: { $in: ids } });
+
+    return response(true, 200, "Media deleted permanently");
   } catch (error) {
     return catchError(error);
   }
