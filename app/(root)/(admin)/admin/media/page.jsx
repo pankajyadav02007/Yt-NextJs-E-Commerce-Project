@@ -50,24 +50,17 @@ const MediaPage = () => {
     return response;
   };
 
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["media-data", deleteType],
-    queryFn: async ({ pageParam = 0 }) =>
-      await fetchMedia(pageParam, deleteType),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, pages) => {
-      const nextPage = pages.length;
-      return lastPage.hasMore ? nextPage : undefined;
-    },
-  });
+  const { data, error, fetchNextPage, hasNextPage, isFetching, status } =
+    useInfiniteQuery({
+      queryKey: ["media-data", deleteType],
+      queryFn: async ({ pageParam = 0 }) =>
+        await fetchMedia(pageParam, deleteType),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, pages) => {
+        const nextPage = pages.length;
+        return lastPage.hasMore ? nextPage : undefined;
+      },
+    });
 
   console.log(data);
 
