@@ -1,5 +1,6 @@
+import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
-import catchError, { isAuthenticated, response } from "@/lib/helperFunction";
+import catchError, { response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import CategoryModel from "@/models/Category.model";
 
@@ -32,7 +33,11 @@ export async function POST(request) {
     });
 
     if (existingCategory) {
-      return response(false, 400, "Category with this name or slug already exists.");
+      return response(
+        false,
+        400,
+        "Category with this name or slug already exists.",
+      );
     }
 
     const newCategory = new CategoryModel({
