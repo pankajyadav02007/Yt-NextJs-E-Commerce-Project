@@ -1,9 +1,9 @@
 import { connectDB } from "@/lib/databaseConnection";
 import cloudinary from "@/lib/cloudinary";
 import catchError, { response } from "@/lib/helperFunction";
-import MediaModel from "@/models/Media.model";
 import mongoose from "mongoose";
 import { isAuthenticated } from "@/lib/authentication";
+import CategoryModel from "@/models/Category.model";
 
 export async function PUT(request) {
   try {
@@ -22,8 +22,8 @@ export async function PUT(request) {
       return response(false, 400, "Invalid or empty id List");
     }
 
-    const media = await MediaModel.find({ _id: { $in: ids } }).lean();
-    if (!media.length) {
+    const category = await CategoryModel.find({ _id: { $in: ids } }).lean();
+    if (!category.length) {
       return response(false, 404, "Data not found");
     }
 
@@ -36,13 +36,13 @@ export async function PUT(request) {
     }
 
     if (deleteType === "SD") {
-      await MediaModel.updateMany(
+      await CategoryModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: new Date().toISOString() } },
       );
       return response(true, 200, "Media moved to trash successfully");
     } else {
-      await MediaModel.updateMany(
+      await CategoryModel.updateMany(
         { _id: { $in: ids } },
         { $set: { deletedAt: null } },
       );
@@ -78,9 +78,9 @@ export async function DELETE(request) {
       );
     }
 
-    const media = await MediaModel.find({ _id: { $in: ids } }).lean();
+    const category = await CategoryModel.find({ _id: { $in: ids } }).lean();
 
-    if (!media.length) {
+    if (!category.length) {
       return response(false, 404, "Data not found");
     }
 
@@ -94,7 +94,7 @@ export async function DELETE(request) {
       return response(false, 500, "Failed to delete images from storage");
     }
 
-    await MediaModel.deleteMany({ _id: { $in: ids } });
+    await CategoryModel.deleteMany({ _id: { $in: ids } });
 
     return response(true, 200, "Media deleted permanently");
   } catch (error) {

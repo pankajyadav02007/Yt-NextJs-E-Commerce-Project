@@ -1,6 +1,6 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
-import catchError from "@/lib/helperFunction";
+import catchError, { response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
 import { NextResponse } from "next/server";
 
@@ -19,9 +19,7 @@ export async function GET(request) {
     const start = parseInt(searchParams.get("start") || 0, 10);
     const size = parseInt(searchParams.get("size") || 10, 10);
     const filters = JSON.parse(searchParams.get("filters") || "[]");
-    const globalFilters = searchParams.get(
-      searchParams.get("globalFilters") || "",
-    );
+    const globalFilter = searchParams.get("globalFilter") || "";
     const sorting = JSON.parse(searchParams.get("sorting") || "[]");
     const deleteType = searchParams.get("deleteType");
 
@@ -29,15 +27,15 @@ export async function GET(request) {
     let matchQuery = {};
     if (deleteType === "SD") {
       matchQuery = { deletedAt: null };
-    } else if (deletedAt === "PD") {
+    } else if (deleteType === "PD") {
       matchQuery = { deletedAt: { $ne: null } };
     }
 
     // globalSearch
-    if (globalFilters) {
+    if (globalFilter) {
       matchQuery["$or"] = [
-        { name: { $regex: globalFilters, $options: "i" } },
-        { slug: { $regex: globalFilters, $options: "i" } },
+        { name: { $regex: globalFilter, $options: "i" } },
+        { slug: { $regex: globalFilter, $options: "i" } },
       ];
     }
 
@@ -56,7 +54,7 @@ export async function GET(request) {
     const aggrationPipeline = [
       { $match: matchQuery },
       {
-        $sort: object.keys(shortQuery).length ? shortQuery : { createdAt: -1 },
+        $sort: Object.keys(shortQuery).length ? shortQuery : { createdAt: -1 },
       },
       { $skip: start },
       { $limit: size },

@@ -176,7 +176,6 @@ const Datatable = ({
         <MRT_ToggleGlobalFilterButton table={table} />
         <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
-        <MRT_ToggleGlobalFilterButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />
 
         {deleteType !== "PD" && (
@@ -244,10 +243,11 @@ const Datatable = ({
           type="button"
           text={
             <>
-              <SaveAltIcon />
+              <SaveAltIcon fontSize="26" />
               Export
             </>
           }
+          className="cursor-pointer"
           loading={exportLoading}
           onClick={() => handleExport(table.getSelectedRowModel().rows)}
         />

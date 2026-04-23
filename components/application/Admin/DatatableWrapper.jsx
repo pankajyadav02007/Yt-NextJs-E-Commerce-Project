@@ -1,5 +1,6 @@
 "use client";
-import { ThemeProvider, useTheme } from "next-themes";
+import { ThemeProvider } from "@mui/material/styles";
+import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import Datatable from "./Datatable";
 import { darkTheme, lightTheme } from "@/lib/materialTheme";
