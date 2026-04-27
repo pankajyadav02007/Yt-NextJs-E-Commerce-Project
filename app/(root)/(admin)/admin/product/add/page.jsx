@@ -22,6 +22,9 @@ import { showToast } from "@/lib/showToast";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/application/Select";
 import Editor from "@/components/application/Admin/Editor";
+import MediaModel from "@/components/application/Admin/MediaModel";
+// import { Key } from "lucide-react";
+import Image from "next/image";
 const breadCrumbData = [
   {
     href: ADMIN_DASHBOARD,
@@ -44,6 +47,10 @@ const AddProduct = () => {
   const { data: getCategory } = useFetch(
     "/api/category?deleteType=SD&&size=10000",
   );
+
+  // media model state
+  const [open, setOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState([]);
 
   useEffect(() => {
     if (getCategory && getCategory.success) {
@@ -255,7 +262,41 @@ const AddProduct = () => {
                   <FormMessage></FormMessage>
                 </div>
               </div>
-              <div className="mb-5">
+
+              <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
+                <MediaModel
+                  open={open}
+                  setOpen={setOpen}
+                  selectedMedia={selectedMedia}
+                  setSelectedMedia={setSelectedMedia}
+                  isMultiple={true}
+                />
+
+                {selectedMedia.length > 0 && (
+                  <div className="flex justify-center items-center flex-wrap mb-3 gap-2">
+                    {selectedMedia.map((media) => (
+                      <div key={media._id} className="h-24 w-24 border">
+                        <Image
+                          src={media.url}
+                          height={100}
+                          width={100}
+                          alt=""
+                          className="size-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div
+                  onClick={() => setOpen(true)}
+                  className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer"
+                >
+                  <span className="font-semibold">Select Media</span>
+                </div>
+              </div>
+
+              <div className="mt-5 mb-3">
                 <ButtonLoading
                   type="submit"
                   text="Add Product"
